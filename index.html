@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>책 전체화면</title>
+    <meta name="description" content="Full-Screen and VR Mode">
+    <script src="dist/aframe-v0.7.0.min.js"></script>
+    <script src="https://npmcdn.com/aframe-event-set-component@3.0.1"></script>
+    <script src="https://npmcdn.com/aframe-template-component@3.1.1"></script>
+    <script src="components/set-image.js"></script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <img id="image" crossorigin="anonymous" src="resource/1-2.jpg">
+        <img id="city" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/city.jpg">
+
+        <script id="link" type="text/html">
+          <a-entity class="link"
+            geometry="primitive: box; height: 1; width: 10; depth:8"
+            material="color: #f77"
+          </a-entity>
+        </script>
+
+        <script>
+          //raycast-scrollup Event
+          AFRAME.registerComponent('raycast-scroll-up', {
+            schema: {
+              target: {type: 'selector'}
+            },
+
+            init: function () {
+              this.el.addEventListener('raycaster-intersected', function (evt) {
+                var el = evt.detail.target;
+                el.setAttribute('material', 'color', '#7f7');
+
+                scrollUpEvt();
+              });
+
+              this.el.addEventListener('raycaster-intersected-cleared', function (evt) {
+                var el = evt.detail.target;
+                el.setAttribute('material', 'color', '#f77');\
+                
+                scrollUpEvt();
+              });
+            },
+
+            scrollUpEvt: function () {
+              var targetEl = this.data.target;
+              // Create animation.
+              targetEl.setAttribute('position', {x: 0, y: -10, z: -1});
+            }
+          }
+          //raycast-scrolldown Event
+          AFRAME.registerComponent('raycast-scroll-down', {
+            schema: {
+              target: {type: 'selector'}
+            },
+
+            init: function () {
+              this.el.addEventListener('raycaster-intersected', function (evt) {
+                var el = evt.detail.target;
+                el.setAttribute('material', 'color', '#7f7');
+
+                scrollDownEvt();
+              });
+
+              this.el.addEventListener('raycaster-intersected-cleared', function (evt) {
+                var el = evt.detail.target;
+                el.setAttribute('material', 'color', '#f77');
+
+                scrollDownEvt();
+              });
+            }
+
+            scrollDownEvt: function () {
+              var targetEl = this.data.target;
+              // Create animation.
+              targetEl.setAttribute('position', {x: 0, y: 10, z: -1});
+            });
+          });
+        </script>
+      </a-assets>
+
+      <!-- 360-degree image. -->
+      <a-sky id="image-360" radius="10" src="#city"></a-sky>
+
+      <a-entity camera look-controls>
+        <a-entity id="book" geometry="primitive: plane; height: 4.5; width: 4.5" material="shader : flat; src: #image; opacity:0.3" position="0 0 -1"></a-entity>
+        <!--<a-image id="book" height=4.5 width=4.5 src="#image" opacity=0.3 position="0 0 -1">-->
+      </a-entity>
+
+      <a-entity>
+        <a-entity template="src: #link" position="0 2 -1" raycast-scroll-up="target: #book"></a-entity>
+        <a-entity template="src: #link" position="0 -2 -1" raycast-scroll-down="target: #book"></a-entity>
+      </a-entity>
+
+
+      <!-- Camera + cursor. -->
+      
+      <a-entity camera look-controls>
+        <a-cursor id="cursor"
+          animation__click="property: scale; startEvents: click; from: 0.1 0.1 0.1; to: 1 1 1; dur: 150"
+          animation__fusing="property: fusing; startEvents: fusing; from: 1 1 1; to: 0.1 0.1 0.1; dur: 1500"
+          event-set__1="_event: mouseenter; color: springgreen"
+          event-set__2="_event: mouseleave; color: black"
+          fuse="true"
+          raycaster="objects: .link"></a-cursor>
+      </a-entity>
+      
+    </a-scene>
+  </body>
+</html>
